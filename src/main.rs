@@ -9,7 +9,7 @@ use config::Config;
 use fslock::LockFile;
 use log::{debug, error};
 use simple_logger::SimpleLogger;
-use hyprland::{event_listener::{EventListener}, shared::{HyprError,HyprData, HyprDataVec}};
+use hyprland::{event_listener::{EventListener}, shared::{HyprError,HyprData}};
 use hyprland::data::{Client,Clients};
 use hyprland::dispatch::{Dispatch,DispatchType::RenameWorkspace};
 use std::collections::HashMap;
@@ -28,13 +28,6 @@ fn update_workspace_name(
                 _ => Some(&window.class),
             };
 
-            // X11 Exact
-            // if let Some(window_props) = &window.window_properties {
-            //     if let Some(class) = &window_props.class {
-            //         exact_name = Some(class);
-            //     }
-            // }
-
             if let Some(exact_name) = exact_name {
                 config
                     .fetch_icon(exact_name, Some(&window.title))
@@ -43,14 +36,13 @@ fn update_workspace_name(
                     "No exact name found for class={:?} and title={:?}",
                     window.class, window.title
                 );
+                // Overwrite right to left characters: https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf#G26.16327
                 format!("\u{202D}{}\u{202C}",
                     config.fetch_icon(&String::new(), Some(&window.title))
                 )
                     
             }
         })
-        // Overwrite right to left characters: https://www.unicode.org/versions/Unicode12.0.0/UnicodeStandard-12.0.pdf#G26.16327
-        // .map(|icon| format!("\u{202D}{icon}\u{202C}"))
         .collect();
 
     let name = &workspace.1[0].workspace.name;
@@ -85,9 +77,8 @@ fn update_workspaces(
     config: &Config,
     args: &Args,
 ) -> Result<(), Box<dyn Error>> {
-    let clients = Clients::get().unwrap().collect();
+    let clients: Vec<Client> = Clients::get().unwrap().collect();
 
-    //build an array of (workspace, [clients])
     let mut workspaces: HashMap<i32, Vec<Client>> = HashMap::new();
     for client in clients {
         let workspace_clients = workspaces.entry(client.workspace.id).or_default();
