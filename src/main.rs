@@ -10,7 +10,7 @@ use fslock::LockFile;
 use log::{debug, error};
 use simple_logger::SimpleLogger;
 use hyprland::{event_listener::{EventListener}, shared::{HyprError,HyprData}};
-use hyprland::data::{Client,Clients};
+use hyprland::data::{Client,Clients,Workspaces};
 use hyprland::dispatch::{Dispatch,DispatchType::RenameWorkspace};
 use std::collections::HashMap;
 
@@ -23,8 +23,8 @@ fn update_workspace_name(
         .iter()
         .map(|window| {
             // Wayland Exact app
-            let exact_name = match window.class.as_str() {
-                "" => None,
+            let exact_name = match window.class.len() {
+                0 => None,
                 _ => Some(&window.class),
             };
 
@@ -45,7 +45,10 @@ fn update_workspace_name(
         })
         .collect();
 
-    let name = &workspace.1[0].workspace.name;
+    let name = match &workspace.1.len() {
+        0 => "",
+        _ => &workspace.1[0].workspace.name,
+    };
 
     let index = workspace.0;
 
@@ -65,7 +68,7 @@ fn update_workspace_name(
     };
 
     if *name != new_name {
-        debug!("rename workspace \"{}\" to \"{}\"", name, new_name);
+        debug!("rename workspace {} to \"{}\"", index, new_name);
 
         Dispatch::call(RenameWorkspace(index, Some(&new_name))).expect(format!("Failed to rename workspace number {}", index).as_str());
     }
@@ -90,6 +93,13 @@ fn update_workspaces(
             error!("failed to update workspace: {}", e);
         }
     }
+    //rename empty workspaces to their index
+    Workspaces::get().unwrap().for_each(|workspace| {
+        if workspace.windows == 0 {
+            update_workspace_name(config, &(workspace.id,vec![]), args).unwrap();
+        }
+    });
+
 
     Ok(())
 }

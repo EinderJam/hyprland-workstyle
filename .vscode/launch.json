@@ -7,11 +7,11 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug executable 'sworkstyle'",
+      "name": "Debug executable 'hyprland-workstyle'",
       "cargo": {
-        "args": ["build", "--bin=sworkstyle", "--package=sworkstyle"],
+        "args": ["build", "--bin=hyprland-workstyle", "--package=hyprland-workstyle"],
         "filter": {
-          "name": "sworkstyle",
+          "name": "hyprland-workstyle",
           "kind": "bin"
         }
       },
