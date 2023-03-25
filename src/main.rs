@@ -80,7 +80,10 @@ fn update_workspaces(
     config: &Config,
     args: &Args,
 ) -> Result<(), Box<dyn Error>> {
-    let clients: Vec<Client> = Clients::get().unwrap().collect();
+    let clients: Clients = Clients::get().unwrap_or_else(|e| {
+        error!("failed to get clients: {}", e);
+        process::exit(1)
+    });
 
     let mut workspaces: HashMap<i32, Vec<Client>> = HashMap::new();
     for client in clients {
