@@ -13,9 +13,9 @@ impl ConfigError {
     }
 }
 
-impl<'n> Display for ConfigError {
+impl Display for ConfigError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        return write!(f, "{}", self.message);
+        write!(f, "{}", self.message)
     }
 }
 

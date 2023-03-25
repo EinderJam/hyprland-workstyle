@@ -57,8 +57,8 @@ fn update_workspace_name(
     }
 
     let mut icons = icons.join(" ");
-    if icons.len() > 0 {
-        icons.push_str(" ")
+    if !icons.is_empty() {
+        icons.push(' ');
     }
 
     let new_name = if !icons.is_empty() {
@@ -70,7 +70,7 @@ fn update_workspace_name(
     if *name != new_name {
         debug!("rename workspace {} to \"{}\"", index, new_name);
 
-        Dispatch::call(RenameWorkspace(index, Some(&new_name))).expect(format!("Failed to rename workspace number {}", index).as_str());
+        Dispatch::call(RenameWorkspace(index, Some(&new_name))).unwrap_or_else(|_| panic!("Failed to rename workspace number {}", index));
     }
 
     Ok(())
@@ -149,7 +149,7 @@ fn check_already_running() {
 
     let locked = file.try_lock().unwrap();
 
-    if locked == false {
+    if !locked {
         error!("hypr-workstyle already running");
         process::exit(1)
     }

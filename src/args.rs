@@ -97,10 +97,10 @@ FLAGS
             }
         }
 
-        return Args {
+        Args {
             log_level,
             config_path,
             deduplicate,
-        };
+        }
     }
 }

@@ -10,7 +10,7 @@ mod config_error;
 mod parse_content_to_config;
 use parse_content_to_config::parse_content_to_config;
 
-pub const DEFAULT_MATCH_CONFIG: &'static [u8] = include_bytes!("../default_config.toml");
+pub const DEFAULT_MATCH_CONFIG: & [u8] = include_bytes!("../default_config.toml");
 
 #[derive(Clone, Debug)]
 pub enum Pattern {
@@ -21,8 +21,8 @@ pub enum Pattern {
 impl PartialEq for Pattern {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::String(r0), Self::Regex(l0)) => l0.to_string() == r0.to_string(),
-            (Self::Regex(l0), Self::String(r0)) => l0.to_string() == r0.to_string(),
+            (Self::String(r0), Self::Regex(l0)) => l0.to_string() == *r0,
+            (Self::Regex(l0), Self::String(r0)) => l0.to_string() == *r0,
             (Self::Regex(l0), Self::Regex(r0)) => l0.to_string() == r0.to_string(),
             (Self::String(l0), Self::String(r0)) => l0 == r0,
         }
@@ -33,7 +33,7 @@ impl TryFrom<String> for Pattern {
     type Error = regex::Error;
 
     fn try_from(mut value: String) -> Result<Self, Self::Error> {
-        if value.starts_with("/") && value.ends_with("/") {
+        if value.starts_with('/') && value.ends_with('/') {
             value.remove(value.len() - 1);
             value.remove(0);
             let regex = Regex::new(&value)?;
@@ -72,7 +72,7 @@ impl Config {
             warn!("Default config could not have been found")
         }
 
-        return Config::default();
+        Config::default()
     }
 
     pub fn fetch_icon(&self, exact_name: &String, generic_name: Option<&String>) -> String {
@@ -147,7 +147,7 @@ impl<S: Into<String>> From<S> for Config {
             }
             Err(e) => {
                 error!("Invalid config format: {}", e);
-                return default;
+                default
             }
         }
     }
@@ -156,7 +156,7 @@ impl<S: Into<String>> From<S> for Config {
 impl Default for Config {
     fn default() -> Self {
         let default_config_content = from_utf8(DEFAULT_MATCH_CONFIG).unwrap().to_string();
-        return parse_content_to_config(&default_config_content).unwrap();
+        parse_content_to_config(&default_config_content).unwrap()
     }
 }
 

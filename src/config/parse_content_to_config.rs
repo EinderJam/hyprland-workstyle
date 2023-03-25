@@ -5,7 +5,7 @@ use toml::Value;
 use super::{config_error::ConfigError, Config, Match, Pattern};
 
 /// Parse toml config content to icon_map
-pub fn parse_content_to_config(content: &String) -> Result<Config, ConfigError> {
+pub fn parse_content_to_config(content: &str) -> Result<Config, ConfigError> {
     let map: Value = toml::from_str(content)?;
 
     let map_to_match = |k: (&String, &Value)| -> Result<Match, ConfigError> {
@@ -25,24 +25,24 @@ pub fn parse_content_to_config(content: &String) -> Result<Config, ConfigError> 
         if let Some(table) = k.1.as_table() {
             let match_type = table
                 .get("type")
-                .ok_or(ConfigError::new(format!("Could not parse: {}", k.0)))?
+                .ok_or_else(||ConfigError::new(format!("Could not parse: {}", k.0)))?
                 .as_str()
-                .ok_or(ConfigError::new(format!(
+                .ok_or_else(||ConfigError::new(format!(
                     "Value of {} is not a string",
                     k.0
                 )))?;
 
             let value = table
                 .get("value")
-                .ok_or(ConfigError::new(format!("Could not parse: {}", k.0)))?
+                .ok_or_else(||ConfigError::new(format!("Could not parse: {}", k.0)))?
                 .as_str()
-                .ok_or(ConfigError::new(format!(
+                .ok_or_else(||ConfigError::new(format!(
                     "Value of {} is not a string",
                     k.0
                 )))?
                 .to_string();
 
-            let m = match &match_type[..] {
+            let m = match match_type {
                 "exact" => Match::Exact {
                     pattern: k.0.to_string(),
                     value,
@@ -70,9 +70,9 @@ pub fn parse_content_to_config(content: &String) -> Result<Config, ConfigError> 
         Value::Table(root) => {
             let matching: Vec<Match> = root
                 .get("matching")
-                .ok_or(ConfigError::new("Matching table not found"))?
+                .ok_or_else(||ConfigError::new("Matching table not found"))?
                 .as_table()
-                .ok_or(ConfigError::new("Could not parse matching table"))?
+                .ok_or_else(||ConfigError::new("Could not parse matching table"))?
                 .iter()
                 .map(map_to_match)
                 .collect::<Result<Vec<Match>, ConfigError>>()?
@@ -83,7 +83,7 @@ pub fn parse_content_to_config(content: &String) -> Result<Config, ConfigError> 
                 Some(value) => {
                     let f = value
                         .as_str()
-                        .ok_or(ConfigError::new("Fallback is not a string"))?;
+                        .ok_or_else(||ConfigError::new("Fallback is not a string"))?;
                     Some(f.to_string())
                 }
                 None => None,
