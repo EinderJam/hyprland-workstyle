@@ -21,16 +21,16 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "Debug unit tests in executable 'sworkstyle'",
+      "name": "Debug unit tests in executable 'hyprland-workstyle'",
       "cargo": {
         "args": [
           "test",
           "--no-run",
-          "--bin=sworkstyle",
-          "--package=sworkstyle"
+          "--bin=hyprland-workstyle",
+          "--package=hyprland-workstyle"
         ],
         "filter": {
-          "name": "sworkstyle",
+          "name": "hyprland-workstyle",
           "kind": "bin"
         }
       },
