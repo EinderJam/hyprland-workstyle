@@ -23,7 +23,7 @@ fn update_workspace_name(
         .iter()
         .map(|window| {
             //ignore unmapped windows
-            if window.mapped == false {
+            if !window.mapped {
                 debug!("Ignoring unmapped window: {:?}", window);
                 return String::new();
             }
