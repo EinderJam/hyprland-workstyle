@@ -20,4 +20,4 @@ fslock = "0.2.1"
 ctrlc = "3.1.9"
 regex = "1.5.4"
 simple_logger = "2.1.0"
-hyprland = { git = "https://github.com/hyprland-community/hyprland-rs.git" }
+hyprland = "0.3.9"
