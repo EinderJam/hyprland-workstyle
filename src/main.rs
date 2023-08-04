@@ -22,6 +22,11 @@ fn update_workspace_name(
     let mut icons: Vec<String> = workspace.1
         .iter()
         .map(|window| {
+            //ignore unmapped windows
+            if window.mapped == false {
+                debug!("Ignoring unmapped window: {:?}", window);
+                return String::new();
+            }
             // Wayland Exact app
             let exact_name = match window.class.len() {
                 0 => None,
